@@ -5,10 +5,16 @@ mixin Page(name)
   html(name=name)
     head
       title Web Jam Blog
+      meta(content="width=device-width, initial-scale=1" name="viewport")
+      meta(charset="utf-8") 
       style.
         p {
           margin-bottom: 1rem;
         } 
+
+        h2 {
+          font-size: 4rem;
+        }
     body[
       flex flex-col gap-12 p6 text-white
       bg-linear-to-b bg-no-repeat bg-purple-800 bg-size-[auto_400px] from-white/20
@@ -29,12 +35,15 @@ mixin Page(name)
 
 mixin BlogPage(title, postOverview)
   - const slug = title.toLocaleLowerCase().replaceAll(/\s+/g, '-')
-  - blogPosts.push([title, slug, postOverview])
+  - blogPosts.push([title, slug, postOverview, 'Ezequiel'])
   +Page(slug)
     +BlogPostHeader(title, slug, postOverview)
-    block
+    div[max-w-screen-md mx-auto bg-purple-900 p6 rounded-6]
+      block
+      div[text-right mt12]
+        +Author()
     
-mixin BlogPostHeader(title, slug, overview)
+mixin BlogPostHeader(title, slug, overview, author)
   div[
     flex flex-col gap-6 max-w-screen-lg mx-auto p6
     bg-linear-to-t bg-white/100 from-black/5 rounded-4 shadow-[0_3px_0_#000]
@@ -43,7 +52,7 @@ mixin BlogPostHeader(title, slug, overview)
     // link to post or not?
    
     a[
-      relative w-1/1 cursor-pointer shrink-0
+      relative shrink-0 w-1/1 cursor-pointer
       font-bold font-mono text-6/16 text-left text-shadow-[1px_2px_0_#fff] text-sky-500 underline
       group underline-2 underline-dashed underline-offset-8 underline-sky-200
       hover:(underline-sky-500 text-sky-400) md:text-center md:w-1/3
@@ -53,7 +62,7 @@ mixin BlogPostHeader(title, slug, overview)
         absolute left-0 top-0 z-1 text-sky-300 blur-4 opacity-0
         duration-500 transition-opacity group-hover:(opacity-100 duration-0)
       ](aria-hidden)=title
-    div[flex-ss w-1/1 grow text-5/8 text-black/77 tracking-0.5px md:flex-cs md:w-2/3]
+    div[flex-ss grow w-1/1 text-5/8 text-black/77 tracking-0.5px md:flex-cs md:w-2/3]
       div[w-full]
         div[
           shrink-0 h-24 ml6 w-24
@@ -62,22 +71,42 @@ mixin BlogPostHeader(title, slug, overview)
         ]
           img[h-full w-full object-cover](src="images/tapping/sm.webp")
         div= overview
-        div[mt6 text-right whitespace-nowrap]
-         
-          a[
-            relative z-0 group
-            inline-block pl0.5 pr4
-            font-bold font-serif text-shadow-[0_1px_0_#0003,0_0_12px_#fff6] tracking-2px text-white
-          ](href="https://ezequielschwartzman.org" target="_blank")
-            span[absolute w-full h-full z-10 b b-black/20 bg-lime-500 group-hover:bg-lime-400 transition-colors bg-linear-to-b from-black/8 shadow-[0_-1px_0] shadow-lime-700 rounded-full]
-            span[absolute -z-3 right-full translate-x-4px group-hover:translate-x-8px transition-transform top-1/2 -translate-y-1/2 bg-lime-50 b b-black/20 b-r-0 bg-linear-to-b from-black/4 rounded-l-full px2 py2 inline-flex items-center justify-center]
-              span[block h-1 w-3 bg-lime-800 rounded-full]
-            img[relative z-11 ml2px inline-block h-8 mb2px mr2 w-8 object-cover rounded-full](src="images/ezequiel/sm.webp")
-            span[relative z-11] Ezequiel
+        if author
+          div[mt6 text-right whitespace-nowrap]
+            span[inline-block scale-75 transform-origin-br]
+              +Author()
+
+mixin Author()
+  a[
+    inline-block relative z-0 pl0.5 pr4
+    font-bold font-serif text-shadow-[0_1px_0_#0003,0_0_12px_#fff6] tracking-2px
+    text-white group
+  ](href="https://ezequielschwartzman.org" target="_blank")
+    span[
+      absolute z-10 h-full w-full
+      b b-black/20 bg-lime-500 bg-linear-to-b from-black/8 rounded-full shadow-[0_-1px_0] shadow-lime-700
+      transition-colors group-hover:bg-lime-400
+    ]
+    span[
+      absolute inline-flex items-center justify-center right-full top-1/2 px2 py2
+      -translate-y-1/2 -z-3 b b-black/20 b-r-0 bg-lime-50 bg-linear-to-b from-black/4 rounded-l-full
+      transition-transform translate-x-4px group-hover:translate-x-8px
+    ]
+      span[block h-1 w-4 bg-lime-800 group-hover:bg-lime-600 rounded-full]
+    img[inline-block relative z-11 h-8 mb2px ml2px mr2 w-8 object-cover rounded-full](src="images/ezequiel/sm.webp")
+    span[relative z-11] Ezequiel
         
 +BlogPage("Web Jam Cannot Be Everything", "Why is Web Jam a Web Crafting Tool and how does it not take over my life")
   :markdown
+    ## Web Jam is a tool
+
+    Web Jam is technology with my own values embedded into it.
+
+    As much as I love working on Web Jam, and talking to people about Web Jam.
+    
     But it can become ubiquitous.
+
+    
 
 +BlogPage("Sourcing Possibility From The Future", "An exploration of values and what becomes possible when we choose values from the future.")
   :markdown
@@ -141,5 +170,5 @@ mixin BlogPostHeader(title, slug, overview)
     
 +Page('index')
   each post in blogPosts
-    +BlogPostHeader(post[0], post[1], post[2])
+    +BlogPostHeader(post[0], post[1], post[2], post[3])
       
